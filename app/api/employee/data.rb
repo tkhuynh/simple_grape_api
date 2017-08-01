@@ -2,17 +2,29 @@ module Employee
 	class Data < Grape::API
 		helpers StrongParamsHelpers
 
+		rescue_from ActiveRecord::RecordNotFound do |e|
+			error!({error: 'Employee not found'}, 404)
+		end
+
+		rescue_from :all
+
 		resource :employee_datas do
 
-			desc 'List all employees'
+			desc 'list all employees'
 
 			get do
 				Emp.all
 			end
 
-		end
+			desc 'list one employee'
 
-		resource :employee_data do
+			params do
+				requires :id, type: String
+			end
+
+			get ':id' do
+				Emp.find(params[:id])
+			end
 
 			desc 'create new employee'
 
@@ -24,13 +36,13 @@ module Employee
 
 			post do
 			  Emp.create!({
-			    name:params[:name],
-			    sport:params[:sport],
-			    age:params[:age]
+			    name: params[:name],
+			    sport: params[:sport],
+			    age: params[:age]
 			  })
 			end
 
-			desc 'update an employee sport'
+			desc 'update an employee'
 
 			params do
 				requires :id, type: String
@@ -38,6 +50,16 @@ module Employee
 
 			put ':id' do
 				Emp.find(params[:id]).update(permitted_params)
+			end
+
+			desc 'delete an employee'
+
+			params do
+				requires :id, type: String
+			end
+
+			delete ':id' do
+				Emp.find(params[:id]).destroy!
 			end
 
 		end
