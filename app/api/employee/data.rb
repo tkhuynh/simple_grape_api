@@ -1,5 +1,6 @@
 module Employee
 	class Data < Grape::API
+		helpers StrongParamsHelpers
 
 		resource :employee_datas do
 
@@ -27,6 +28,16 @@ module Employee
 			    sport:params[:sport],
 			    age:params[:age]
 			  })
+			end
+
+			desc 'update an employee sport'
+
+			params do
+				requires :id, type: String
+			end
+
+			put ':id' do
+				Emp.find(params[:id]).update(permitted_params)
 			end
 
 		end
